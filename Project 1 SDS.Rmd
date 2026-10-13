@@ -1,0 +1,102 @@
+---
+title: "Project 1"
+author: "Alexis Luciano"
+output:
+  html_document:
+    theme: journal
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.height=5, fig.width=7, tidy=TRUE,echo = TRUE)
+```
+
+## **Business Dynamics Statistics (BDS)**
+
+### **1. Introduction**
+
+##### **In an unpredictable market companies find themselves growing or declining, but with the following data gathered we can find a relationship between variables to better explain this market. The following data is from the Business Dynamics Statistics (BDS) that includes measures of establishments openings and closings to job creation and destruction. The data tracks the changes in employment at the establishment level, which provides a clearer picture of the dynamics underlying aggregate net employment growth.I will be using the Establishment Exited Rate as my outcome variable and my predictors will be Number of Firms, the establishments that entered the market, and State. I chose my predictor variables because the amount of firms in, and entering the market can show some pattern in terms of establishment exits. In addition, the population size of each state can also influence the amount of exits. To find more information about the BDS, and to better understand the variables click this [link](https://corgis-edu.github.io/corgis/csv/business_dynamics/) **
+
+![Caption](/Users/alexi/Downloads/Busy bee.jpg)
+
+### **2. Outcome Variable**
+
+#### *Exits*
+
+```{r echo=FALSE}
+library(ggplot2)
+Business <- read.csv('Business.CSV')
+Business_ggplot <- ggplot(Business)
+#I made my Business dataset into a ggplot
+Business_ggplot + geom_histogram(aes(x=Data.Establishments.Exited), binwidth= 5000, fill= 'darkgreen', col= 'black')+ labs(title='Distribution of Establishments that Exited the Market (1978-2018)
+',x='Establishments that Exited',y='Frequency')
+#I created a histogram for my dataset
+
+```
+
+#### *Outcome Variable Statistics*
+
+##### **The following distribution is skewed right with a mean of `r format(round(mean(Business$Data.Establishments.Exited, na.rm= TRUE),2), big.mark= ',')` and a median of `r round(median(Business$Data.Establishments.Exited, na.rm=TRUE),2)`. Most of the establishments that exited between 1978 to 2018 were between 0 to 25000.**
+
+### **3. Bivariate Analysis**
+
+#### *Entry vs. Exit*
+
+```{r, echo=FALSE}
+Business_ggplot+ geom_point(aes(x= Data.Establishments.Entered, y= Data.Establishments.Exited), col= 'forestgreen')+labs(title= 'Entry vs. Exit in Establishments', x= 'Establishments that Entered', y='Establishments that Exited') 
+#For my predictor variable "Date.Establishments.Entered" I created a scatterplot to show its relation to my outcome variable.
+```
+
+##### **The following relationship between establishments that exited and establishments that entered within the past 40 years is very strongly correlated with a number `r round(cor(Business$Data.Establishments.Exited, Business$Data.Establishments.Entered, use="complete.obs"),2)`. This indicates that as more establishments enter, there is an equal proportion of establishments that are exiting. visit [this site](https://online.stat.psu.edu/stat501/lesson/1/1.3) to better understand what correlations are and how they are used to find relationships between variables: **
+
+#### *Number of Firms vs. Exit*
+
+```{r, echo=FALSE}
+Business_ggplot+ geom_point(aes(x= Data.Number.of.Firms, y=Data.Establishments.Exited), col='gold',)+ scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +labs(title= 'Number of Firms vs. Exit', x='Number of Firms', y='Establishments that Exited')
+#Same thing here, made a scatterplot to show the relationship between "Data.Number.of.Firms" and the outcome variable.
+```
+
+##### **The number of firms is closely related with the number of establishments that exited the market. The correlation between the two is very strong with a number `r round(cor(Business$Data.Number.of.Firms, Business$Data.Establishments.Exited),2)`. This indicates that as the number of firms increases, there is a proportional amount of establishments that are exiting the market. **
+
+#### *State vs. Exit*
+
+```{r pressure, echo=FALSE}
+Business_ggplot+ geom_boxplot(aes(x= State , y= Data.Establishments.Exited, fill= State ))+labs(title= 'State vs. Exit', x= 'State', y='Amount of Establishments that Exited')
+#Here I created a boxplot for the predictor "State" and my Outcome variable.
+```
+
+```{r, echo=FALSE}
+library(kableExtra)
+#loaded in kableExtra to make a table
+summary_table <- head(aggregate(Data.Establishments.Exited ~ State, Business, function(x) c(mean = mean(x, na.rm = TRUE), median = median(x, na.rm = TRUE))),10)
+summary_table <- do.call(data.frame, summary_table)
+colnames(summary_table) <- c('State', 'Mean Exits', 'Median Exits')
+sum_table <- kbl(summary_table, caption = 'First 10 States')
+kable_classic(sum_table)
+#This shows a table of the state where firms exited with the statistics mean and median.
+```
+
+
+
+##### **According to the statistics the amount of establishments that exited the market vary widely among different states. Population size is one factor that best explains this variety.**
+
+```{r, echo=FALSE}
+Business_ggplot+ geom_point(aes(x=Data.Establishments.Entered, y=Data.Establishments.Exited, color=State)) + theme(legend.position = "none")
+#Here I created a multivariate graph that shows the relationship between my outcome variable and the predictor variables "Data.Establishments.Entered" and "State".
+```
+
+##### **The multivariate graph shows that there is a strong correlation in the number of firms that entered and establishments that exited. However, there seems to be no correlation with state because the color of data points are scattered.**
+
+### **4. Choice Elements**
+ 
+##### **In the introduction, I hyperlinked the data set to include more information about the data and where it came from. In the bivariate analysis section, I added another hyperlink to include more information about the correlation of businesses entering and exiting. I included inline code in the outcome variable statistics section. Throughout my analysis, I changed the default font style. In the bivariate statistics section, I made a new subset called summary_table. In addition, I made a multivariate graph.**
+### **5. Take away**
+
+##### **The establishments exited can best be predicted by the number of establishment entries and the number of firms in the market. However, there is no correlation between the state and establishments exited. Based off the information seen, exits are not necessarily a sign of economic weakness, rather it shows that there is an ongoing cycle of entry and exits within the market.**
+
+
+### **Citations**
+**MBA, Paul J. Beckert, and About Paul J. Beckert MBA. “The Value of Business Planning.” Pinnacle Business Solutions, 26 July 2019, pinnacle-business.com/the-value-of-business-planning/. **
+
+**1.3 - the Simple Linear Regression Model: Stat 501.” PennState: Statistics Online Courses, online.stat.psu.edu/stat501/lesson/1/1.3. Accessed 26 Sept. 2025.**
+
+**Business Dynamics CSV File.” CORGIS Datasets Project, corgis-edu.github.io/corgis/csv/business_dynamics/. Accessed 26 Sept. 2025.**
